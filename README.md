@@ -10,14 +10,14 @@ That's what I tried to answer here: which areas of Chicago look like nightlife
 areas, and which ones are just busy during commuting hours?
 
 ## What I found
-- **Wrigleyville/Lakeview is the most consistent late-night area.** Three of the
+- Wrigleyville/Lakeview is the most consistent late-night area. Three of the
   top five clusters sit within a few blocks of each other.
-- **Logan Square has the biggest single spike.** Its share of late-night pickups
+- Logan Square has the biggest single spike. Its share of late-night pickups
   runs 33 percentage points higher than the city's.
-- **River North has the most trips of any nightlife area, but doesn't crack the
-  top five.** It's busy around the clock, so late night is a smaller slice of
+- River North has the most trips of any nightlife area, but doesn't crack the
+  top five. It's busy around the clock, so late night is a smaller slice of
   its total.
-- **Wicker Park shows up, but only in the second tier.** I expected it to rank
+- Wicker Park shows up, but only in the second tier. I expected it to rank
   higher. It lands in "Leans Nightlife Pocket," which I think is the same
   all-day-traffic effect as River North.
 - Out of 659 areas, only 4 looked strongly like nightlife pockets and 21 leaned
@@ -63,7 +63,7 @@ be inflated by Wrigley Field events and campus areas.
 | Leans Commuter Zone | ≤ 10 | ≤ 8 | < 5 |
 | Mixed/Other | everything else | | |
 
-*Late night = 9 p.m. to 6 a.m. Weekend = Saturday and Sunday.*
+Late night = 9 p.m. to 6 a.m. Weekend = Saturday and Sunday.
 
 ## Decisions I had to make along the way
 - **Why coordinates instead of census tracts.** Census tract was only filled in
@@ -81,39 +81,30 @@ be inflated by Wrigley Field events and campus areas.
   the median as a sanity check, none of the top 10 cells changed. (One note: when
   I reran this later, `APPROX_QUANTILES` returned 7,713 instead. It's an
   approximation, so the number moves slightly. The analysis uses 7,607.)
-- **Why ~400m clusters.** Rounding to 2 decimals (about 1.1 km) lumped too much
-  together and produced 74 clusters with conflicting signatures inside them, so I
-  went smaller. A 500m grid and a ~400m grid each came out with 9 conflicts, but
-  the 500m version had one cluster mixing opposite ends of the scale, while every
-  400m conflict was between neighboring categories. So I went with ~400m, which in
-  practice means 0.004° steps: about 445m north-south and 330m east-west at
-  Chicago's latitude. This part took the longest, since I had to learn how
-  coordinate data actually works.
+- **Why 400m clusters.** My first pass grouped cells into chunks roughly a kilometer wide, which turned out to be too much. It lumped 74 clusters together that had conflicting signatures inside them, meaning one cluster was being called a nightlife pocket and a commuter zone at the same time. So I went smaller and tested two sizes, roughly 500m and roughly 400m. Both came out with 9 conflicts, so the count alone didn't tell me which was better. What decided it was how bad the conflicts were. The 500m version had one cluster mixing complete opposites, while every conflict in the 400m version was between neighboring categories, which I could accept more. I went with 400m. (The cells aren't perfectly square, since the way coordinates work makes them a bit taller than wide, around 445m by 330m.) This part took the longest, since I had to learn how coordinate data actually works.
 - **A cell I caught by checking the map.** One high-ranking South Loop/Chinatown
   cell has its center point sitting under a highway. I checked it manually and
   flagged it. There are probably others I didn't catch, since I only spot-checked
   the top cells.
 
+
 ## What this doesn't tell you
-- **It's pickups only.** A late-night pickup could be someone leaving a bar, or
-  someone leaving home to go out, or someone heading to a second bar. That means a
-  residential area full of young people can score high, and it might be inflating
-  Logan Square's number.
-- **My late-night window is wide.** 9 p.m. to 6 a.m. includes 4 and 5 a.m., which
+- It's pickups only. This is the limitation I'd fix first. A late-night pickup could be someone leaving a bar or restaurant, someone leaving their apartment to go out, or someone bar-hopping to the next spot, and I can't tell those apart. Considering how much of the nightlife sits right in residential neighborhoods, that makes the problem worse here than it might be elsewhere. In Logan Square you've got bars across the street from apartments, so a person getting picked up at 11 p.m. might live on that block or might be leaving the bar next door. Either way it counts the same in my data, which is why I lean toward Wrigleyville over Logan Square even though Logan Square has the bigger number.
+- My late-night window is wide. 9 p.m. to 6 a.m. includes 4 and 5 a.m., which
   is probably airport runs and early shifts, not nightlife.
-- **It measures share, not volume.** A cell's score is the *fraction* of its trips
+- It measures share, not volume. A cell's score is the *fraction* of its trips
   that happen late at night, not how many. Places that are packed all day get
-  underrated (see River North and Wicker Park).
-- **Grid lines cut through real places.** One bar strip can get split across a few
-  cells, which waters down each one.
-- **Things I know are mixed in.** Wrigley Field events, and campus areas like
+  underrated (see River North and Wicker Park). Grid lines cut through real
+  places. One bar strip can get split across a few cells, which waters down
+  each one.
+- Things I know are mixed in. Wrigley Field events, and campus areas like
   Hyde Park and Lincoln Park where student activity looks a lot like nightlife.
-- **It's one signal.** Rideshare riders only. No walkers, drivers, or CTA riders,
+- It's one signal. Rideshare riders only. No walkers, drivers, or CTA riders,
   and nothing about rent, competition, or licensing.
 
-## What I'd do next (v2)
-Partway through interpreting this, I realized one big window from 9 p.m. to 6 a.m.
-can't tell "going out" apart from "going home." For a second version I'd:
+## What I'd do next (updated version)
+Towards the end of this project, I realized one big window from 9 p.m. to 6 a.m.
+can't tell "going out" apart from "going home." For an updated version I'd:
 1. Count both ends of every trip, using the trip end time for dropoffs.
 2. Split late night into an early window (about 9 p.m. to midnight) and a late one
    (about midnight to 4 a.m.), which also drops the early-morning airport hours.
