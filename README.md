@@ -121,6 +121,7 @@ can't tell "going out" apart from "going home." For an updated version I'd:
 | File | What it is |
 |---|---|
 | `bigq.sql` | All the BigQuery queries |
+| `bigqoutput.csv` | BigQuery output after transformations |
 | `chi_tnp_proj.ipynb` | Python notebook: signatures and clustering |
 | `final_clustered_output.csv` | Final labeled and clustered output (659 cells) |
 | `tnp_cluster_viz_prerec.pbix` | Power BI dashboard (needs Power BI Desktop) |
